@@ -30,9 +30,6 @@ namespace AION.Chat
         private bool IsSoundEnabled { get; set; } = true;
         private bool IsSoundPlaying { get; set; }
 
-        /// <summary>
-        /// Initialize a new <see cref="Chat"/> instance.
-        /// </summary>
         public Chat()
         {
             InitializeComponent();
@@ -49,10 +46,6 @@ namespace AION.Chat
             Selected = Channels["All"];
         }
 
-        /// <summary>
-        /// Switch channel window.
-        /// </summary>
-        /// <param name="channel">Selected channel.</param>
         private void ToggleChannel(RichTextBox channel)
         {
             foreach (RichTextBox c in Channels.Values)
@@ -62,10 +55,6 @@ namespace AION.Chat
             Selected.Show();
         }
 
-        /// <summary>
-        /// Create a new channel.
-        /// </summary>
-        /// <returns></returns>
         private RichTextBox CreateChannel()
         {
             RichTextBox channel = new()
@@ -85,9 +74,6 @@ namespace AION.Chat
             return channel;
         }
 
-        /// <summary>
-        /// Sync aion chat log file.
-        /// </summary>
         private void SyncChatLog()
         {
             FileStream?.Dispose();
@@ -111,9 +97,6 @@ namespace AION.Chat
             ChatLogWatcher.Changed += ChatLog_Changed;
         }
 
-        /// <summary>
-        /// Change the chat log file.
-        /// </summary>
         public void ChangeLogFile()
         {
             using OpenFileDialog dialog = new()
@@ -128,10 +111,6 @@ namespace AION.Chat
             }
         }
 
-        /// <summary>
-        /// Parse and edit The line to show in the right <see cref="RichTextBox"/>.
-        /// </summary>
-        /// <param name="line">The line.</param>
         private void ProcessLine(string line)
         {
             RichTextBox channel = null;
@@ -163,19 +142,11 @@ namespace AION.Chat
             Task.Run(() => Invoke(() => CheckNotify(line)));
         }
 
-        /// <summary>
-        /// Process broken chars.
-        /// </summary>
-        /// <param name="line">The line.</param>
         private void ProcessChars(ref string line)
         {
             line = line.Replace("&#39;", "'");
         }
 
-        /// <summary>
-        /// Check if the line is in the trigger list.
-        /// </summary>
-        /// <param name="line">The line.</param>
         private async Task CheckNotify(string line)
         {
             var triggers = TriggerForm.TriggerBox.Items.Cast<ListViewItem>();
@@ -194,9 +165,6 @@ namespace AION.Chat
             await NotifySoundLoop();
         }
 
-        /// <summary>
-        /// Notify user with a system sound.
-        /// </summary>
         private async Task NotifySoundLoop()
         {
             if (IsSoundPlaying || !IsSoundEnabled)
@@ -211,10 +179,6 @@ namespace AION.Chat
             IsSoundPlaying = false;
         }
 
-        /// <summary>
-        /// Parse links and assign fetched value.
-        /// </summary>
-        /// <param name="line">The line.</param>
         private void ProcessLinks(ref string line)
         {
             Regex regexLink = new(@"(\[.*?:.*?])");
@@ -258,10 +222,6 @@ namespace AION.Chat
             }
         }
 
-        /// <summary>
-        /// Parse the log date and print in gray color.
-        /// </summary>
-        /// <param name="line">The line.</param>
         public void ProcessDate(ref string line)
         {
             Regex time = new(@"([0-9:]{8})");
@@ -271,12 +231,6 @@ namespace AION.Chat
             line = removeDate.Replace(line, date);
         }
 
-        /// <summary>
-        /// Print line to the main channel and processed channel.
-        /// </summary>
-        /// <param name="line">The line.</param>
-        /// <param name="color">Line foreground <see cref="Color"/>.</param>
-        /// <param name="channel">The processed channel.</param>
         public void Print(string line, Color color, RichTextBox channel = null)
         {
             // Write to the main channel
@@ -293,9 +247,6 @@ namespace AION.Chat
             }
         }
 
-        /// <summary>
-        /// Toggle trigger sounds.
-        /// </summary>
         private void ButtonMute_Click(object sender, EventArgs e)
         {
             IsSoundEnabled = !IsSoundEnabled;
@@ -304,44 +255,14 @@ namespace AION.Chat
                 : (Image)Resources.GetObject("muted");
         }
 
-        /// <summary>
-        /// Clear current channel output.
-        /// </summary>
         private void ButtonClean_Click(object sender, EventArgs e) => Selected?.Clear();
-
-        /// <summary>
-        /// All channels.
-        /// </summary>
         private void ButtonAll_Click(object sender, EventArgs e) => ToggleChannel(Channels["All"]);
-
-        /// <summary>
-        /// LFG channel.
-        /// </summary>
         private void ButtonLFG_Click(object sender, EventArgs e) => ToggleChannel(Channels["LFG"]);
-
-        /// <summary>
-        /// PM channel.
-        /// </summary>
         private void ButtonPM_Click(object sender, EventArgs e) => ToggleChannel(Channels["PM"]);
-
-        /// <summary>
-        /// Trigger popup.
-        /// </summary>
         private void ButtonTrigger_Click(object sender, EventArgs e) => TriggerForm.Show();
-
-        /// <summary>
-        /// Ban popup.
-        /// </summary>
         private void ButtonBan_Click(object sender, EventArgs e) => BanForm.Show();
-
-        /// <summary>
-        /// Select chat log file.
-        /// </summary>
         private void ButtonLog_Click(object sender, EventArgs e) => ChangeLogFile();
-
-        /// <summary>
-        /// Callback on chat log changes.
-        /// </summary>
+        
         private void ChatLog_Changed(object sender, FileSystemEventArgs e)
         {
             for (string line = Reader.ReadLine(); line != null; line = Reader.ReadLine())
@@ -351,9 +272,6 @@ namespace AION.Chat
             }
         }
 
-        /// <summary>
-        /// Save user settings.
-        /// </summary>
         private void Chat_FormClosing(object sender, FormClosingEventArgs e)
         {
             Properties.Settings.Default.LogPath = ChatLogPath;
@@ -377,9 +295,6 @@ namespace AION.Chat
             Properties.Settings.Default.Save();
         }
 
-        /// <summary>
-        /// Load user setting.
-        /// </summary>
         private void Chat_Load(object sender, EventArgs e)
         {
             ChatLogPath = Properties.Settings.Default.LogPath;
@@ -399,9 +314,6 @@ namespace AION.Chat
             SyncChatLog();
         }
 
-        /// <summary>
-        /// Dispose all resources.
-        /// </summary>
         public new void Dispose()
         {
             foreach (RichTextBox chat in Channels.Values)
